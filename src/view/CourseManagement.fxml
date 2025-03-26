@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.VBox?>
+<?import javafx.scene.layout.HBox?>
+
+<!--
+    StudentCourseRegistration.fxml
+    Displays two TableViews:
+    1) Available Courses
+    2) Courses the student is enrolled in
+
+    Includes buttons for 'Register' and 'Drop'.
+-->
+<VBox xmlns:fx="http://javafx.com/fxml" fx:controller="ui.StudentCourseRegistrationController"
+      spacing="10" style="-fx-padding: 20;">
+
+    <!-- Available Courses Section -->
+    <Label text="Available Courses" style="-fx-font-size: 16px;"/>
+    <TableView fx:id="availableCoursesTable">
+        <columns>
+            <TableColumn fx:id="availableCourseCodeCol" text="Code" prefWidth="80"/>
+            <TableColumn fx:id="availableCourseNameCol" text="Name" prefWidth="120"/>
+            <TableColumn fx:id="availableCreditHoursCol" text="Credits" prefWidth="60"/>
+            <TableColumn fx:id="availableInstructorCol" text="Instructor" prefWidth="100"/>
+        </columns>
+    </TableView>
+    <Button fx:id="registerButton" text="Register for Selected Course" onAction="#handleRegister"/>
+
+    <!-- Enrolled Courses Section -->
+    <Label text="My Enrolled Courses" style="-fx-font-size: 16px;"/>
+    <TableView fx:id="enrolledCoursesTable">
+        <columns>
+            <TableColumn fx:id="enrolledCourseCodeCol" text="Code" prefWidth="80"/>
+            <TableColumn fx:id="enrolledCourseNameCol" text="Name" prefWidth="120"/>
+            <TableColumn fx:id="enrolledCreditHoursCol" text="Credits" prefWidth="60"/>
+            <TableColumn fx:id="enrolledInstructorCol" text="Instructor" prefWidth="100"/>
+        </columns>
+    </TableView>
+    <Button fx:id="dropButton" text="Drop Selected Course" onAction="#handleDrop"/>
+</VBox>

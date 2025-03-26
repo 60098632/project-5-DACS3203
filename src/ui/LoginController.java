@@ -34,33 +34,44 @@ public class LoginController {
     private void handleLogin() {
         String studentId = studentIdField.getText().trim();
         String password = passwordField.getText();
-
-        // Retrieve the client's IP address
         String ipAddress = getIpAddress();
 
-        // Check if required fields are filled
         if (studentId.isEmpty() || password.isEmpty()) {
             DatabaseLogger.log("WARNING", "Login attempt with empty fields", ipAddress);
             showAlert("Please fill in all fields.");
             return;
         }
 
-        // Attempt to authenticate the user
         User user = AuthService.login(studentId, password);
 
         if (user != null) {
-            // Reset the failed login counter on successful login
             DatabaseLogger.log("INFO", "Successful login for user", ipAddress);
             failedLoginAttempts = 0;
-            showAlert("Login successful! Welcome " + user.getName());
-            // TODO: Navigate to dashboard screen here
+
+            try {
+                javafx.fxml.FXMLLoader loader = new javafx.fxml.FXMLLoader(getClass().getResource("/view/dashboard.fxml"));
+                javafx.scene.Parent root = loader.load();
+
+                // Securely pass user details to Dashboard
+                DashboardController controller = loader.getController();
+                controller.setCurrentUser(
+                        user.getName(),
+                        user.getRole(),     // role needed to control access
+                        user.getId()        // studentId needed for enrollment/payment
+                );
+
+                studentIdField.getScene().setRoot(root);
+
+            } catch (Exception e) {
+                e.printStackTrace();
+                showAlert("Error loading the dashboard screen.");
+            }
+
         } else {
-            // Increment the counter on failed login
             failedLoginAttempts++;
-            DatabaseLogger.log("WARNING", "Failed login attempt for user (attempt " + failedLoginAttempts + ")", ipAddress);
+            DatabaseLogger.log("WARNING", "Failed login attempt (attempt " + failedLoginAttempts + ")", ipAddress);
             if (failedLoginAttempts >= 3) {
-                DatabaseLogger.log("WARNING", "User has failed to login 3 or more times", ipAddress);
-                // Additional actions can be taken here, such as account lockout or alerting an administrator.
+                DatabaseLogger.log("WARNING", "User failed to login 3 or more times", ipAddress);
             }
             showAlert("Invalid student ID or password.");
         }

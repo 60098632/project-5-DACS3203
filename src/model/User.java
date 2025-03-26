@@ -1,28 +1,29 @@
 package model;
 
 /**
- * Represents a user in the system.
+ * Represents a user in the system, including role and hashed password.
  */
 public class User {
-    private int id;
+    private String id;               // University ID, e.g. 60xxxxxx
     private String name;
     private String email;
+    private String role;            // student, instructor, or admin
     private String passwordHash;
 
-    // Constructor for new user (before DB insert)
-    public User(String name, String email, String passwordHash) {
+    /**
+     * Constructor for loading user from the database.
+     */
+    public User(String id, String name, String email, String role, String passwordHash) {
+        this.id = id;
         this.name = name;
         this.email = email;
+        this.role = role;
         this.passwordHash = passwordHash;
     }
 
-    // Getters & setters
-    public int getId() {
+    // Getters
+    public String getId() {
         return id;
-    }
-
-    public void setId(int id) {
-        this.id = id;
     }
 
     public String getName() {
@@ -33,11 +34,20 @@ public class User {
         return email;
     }
 
+    public String getRole() {
+        return role;
+    }
+
     public String getPasswordHash() {
         return passwordHash;
     }
 
+    // Setters
     public void setPasswordHash(String passwordHash) {
         this.passwordHash = passwordHash;
+    }
+
+    public void setRole(String role) {
+        this.role = role;
     }
 }

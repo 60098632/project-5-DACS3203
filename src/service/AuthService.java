@@ -70,9 +70,8 @@ public class AuthService {
      * @return The generated university ID if registration is successful, or null if it fails.
      */
     public static String register(String name, String email, String password) {
-        String sql = "INSERT INTO users (id, name, email, password, salt) VALUES (?, ?, ?, ?, ?)";
+        String sql = "INSERT INTO users (id, name, email, password, salt, role) VALUES (?, ?, ?, ?, ?, ?)";
 
-        // Generate custom university ID, salt, and hashed password
         String universityId = generateUniversityId();
         String salt = generateSalt();
         String hashed = hashPasswordWithSalt(password, salt);
@@ -85,6 +84,7 @@ public class AuthService {
             stmt.setString(3, email);
             stmt.setString(4, hashed);
             stmt.setString(5, salt);
+            stmt.setString(6, "student"); // default role
 
             stmt.executeUpdate();
             return universityId;
@@ -120,16 +120,14 @@ public class AuthService {
                 String inputHash = hashPasswordWithSalt(password, salt);
 
                 if (storedHash.equals(inputHash)) {
-                    // Create a User object using retrieved data.
-                    User user = new User(
+                    // Use new constructor with role and string ID
+                    return new User(
+                            rs.getString("id"),
                             rs.getString("name"),
                             rs.getString("email"),
+                            rs.getString("role"),
                             storedHash
                     );
-                    // Convert the custom university ID (stored as a String) to an int.
-                    // Make sure that your university IDs are valid integers.
-                    user.setId(Integer.parseInt(rs.getString("id")));
-                    return user;
                 }
             }
 
