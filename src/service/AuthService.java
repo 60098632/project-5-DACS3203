@@ -8,8 +8,12 @@ import java.security.NoSuchAlgorithmException;
 import java.security.SecureRandom;
 import java.sql.*;
 import java.util.Base64;
+import java.util.logging.Logger;
 
 public class AuthService {
+
+    // Logger for logging exceptions and informational messages
+    private static final Logger logger = Logger.getLogger(AuthService.class.getName());
 
     /**
      * Generates a random salt string using SecureRandom and encodes it in Base64.
@@ -23,7 +27,7 @@ public class AuthService {
 
     /**
      * Generates a unique university ID in the format 60XXXXXX where X is 1-9.
-     * @return the generated university ID
+     * @return the generated university ID as a String
      */
     public static String generateUniversityId() {
         StringBuilder id = new StringBuilder("60");
@@ -36,9 +40,9 @@ public class AuthService {
 
     /**
      * Hashes a password with a given salt using SHA-256.
-     * @param password The plain password
-     * @param salt The salt
-     * @return SHA-256 hash of (password + salt)
+     * @param password The plain password.
+     * @param salt The salt.
+     * @return SHA-256 hash of (password + salt) as a hex string.
      */
     public static String hashPasswordWithSalt(String password, String salt) {
         try {
@@ -50,20 +54,25 @@ public class AuthService {
             for (byte b : hash) {
                 sb.append(String.format("%02x", b));
             }
-
             return sb.toString();
 
         } catch (NoSuchAlgorithmException e) {
-            throw new RuntimeException("SHA-256 algorithm not found.");
+            // In production, consider using a more secure algorithm like PBKDF2, bcrypt, or scrypt.
+            throw new RuntimeException("SHA-256 algorithm not found.", e);
         }
     }
 
     /**
-     * Registers a user with a salted + hashed password.
+     * Registers a user with a salted and hashed password.
+     * @param name The user's name.
+     * @param email The user's email address.
+     * @param password The user's plain password.
+     * @return The generated university ID if registration is successful, or null if it fails.
      */
-    public static boolean register(String name, String email, String password) {
+    public static String register(String name, String email, String password) {
         String sql = "INSERT INTO users (id, name, email, password, salt) VALUES (?, ?, ?, ?, ?)";
 
+        // Generate custom university ID, salt, and hashed password
         String universityId = generateUniversityId();
         String salt = generateSalt();
         String hashed = hashPasswordWithSalt(password, salt);
@@ -71,35 +80,38 @@ public class AuthService {
         try (Connection conn = DBConnection.getConnection();
              PreparedStatement stmt = conn.prepareStatement(sql)) {
 
-            stmt.setString(1, universityId);  // Custom ID
+            stmt.setString(1, universityId);  // Custom ID stored as a String
             stmt.setString(2, name);
             stmt.setString(3, email);
             stmt.setString(4, hashed);
             stmt.setString(5, salt);
 
             stmt.executeUpdate();
-            return true;
+            return universityId;
 
         } catch (SQLIntegrityConstraintViolationException e) {
             System.out.println("❌ Email already exists.");
-            return false;
+            return null;
 
         } catch (SQLException e) {
-            e.printStackTrace();
-            return false;
+            logger.severe("SQL Exception in register: " + e.getMessage());
+            return null;
         }
     }
 
     /**
-     * Authenticates a user by comparing hashed (input + salt) to stored password.
+     * Authenticates a user by comparing the hashed (input + salt) password to the stored hash.
+     * @param studentId The custom university ID provided by the user.
+     * @param password The plain password provided by the user.
+     * @return A User object if authentication is successful, or null if it fails.
      */
-    public static User login(String email, String password) {
-        String sql = "SELECT * FROM users WHERE email = ?";
+    public static User login(String studentId, String password) {
+        String sql = "SELECT * FROM users WHERE id = ?";
 
         try (Connection conn = DBConnection.getConnection();
              PreparedStatement stmt = conn.prepareStatement(sql)) {
 
-            stmt.setString(1, email);
+            stmt.setString(1, studentId);
             ResultSet rs = stmt.executeQuery();
 
             if (rs.next()) {
@@ -108,18 +120,21 @@ public class AuthService {
                 String inputHash = hashPasswordWithSalt(password, salt);
 
                 if (storedHash.equals(inputHash)) {
+                    // Create a User object using retrieved data.
                     User user = new User(
                             rs.getString("name"),
                             rs.getString("email"),
                             storedHash
                     );
-                    user.setId(rs.getInt("id"));
+                    // Convert the custom university ID (stored as a String) to an int.
+                    // Make sure that your university IDs are valid integers.
+                    user.setId(Integer.parseInt(rs.getString("id")));
                     return user;
                 }
             }
 
         } catch (SQLException e) {
-            e.printStackTrace();
+            logger.severe("SQL Exception in login: " + e.getMessage());
         }
 
         return null;

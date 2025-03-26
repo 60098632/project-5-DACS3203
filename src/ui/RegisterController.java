@@ -1,18 +1,16 @@
 package ui;
 
-import java.util.logging.Logger;
-import java.util.logging.Level;
+import javafx.scene.input.Clipboard;
+import javafx.scene.input.ClipboardContent;
 import java.util.regex.Pattern;
 import javafx.fxml.FXML;
 import javafx.scene.control.Alert;
 import javafx.scene.control.PasswordField;
 import javafx.scene.control.TextField;
 import service.AuthService;
-import util.DatabaseLogger;
 
 public class RegisterController {
 
-    private static final Logger logger = Logger.getLogger(RegisterController.class.getName());
 
     @FXML
     private TextField nameField;
@@ -41,24 +39,18 @@ public class RegisterController {
         // Validate name
         if (!namePattern.matcher(name).matches()) {
             showAlert("Invalid name. Use at least 3 letters and only letters/spaces.");
-            logger.warning("Invalid name input attempt: " + name);
-            DatabaseLogger.log("WARNING", "Invalid name input attempt", email);
             return;
         }
 
         // Validate email
         if (!emailPattern.matcher(email).matches()) {
             showAlert("Invalid email format.");
-            logger.warning("Invalid email input attempt: " + email);
-            DatabaseLogger.log("WARNING", "Invalid email input attempt", email);
             return;
         }
 
         // Validate password strength
         if (!passwordPattern.matcher(password).matches()) {
             showAlert("Password must be at least 8 characters, include a number and a special character.");
-            logger.warning("Weak password input attempt for email: " + email);
-            DatabaseLogger.log("WARNING", "Weak password input attempt", email);
             return;
         }
 
@@ -68,23 +60,20 @@ public class RegisterController {
         }
 
         if (!password.equals(confirmPassword)) {
-            logger.warning("Password mismatch during registration attempt for: " + email);
-            DatabaseLogger.log("WARNING", "Password mismatch during registration", email);
             showAlert("Passwords do not match.");
             return;
         }
 
-        boolean success = AuthService.register(name, email, password);
+        String generatedId = AuthService.register(name, email, password);
 
-        if (success) {
-            String generatedId = AuthService.generateUniversityId();
-            logger.info("New user registered: " + email);
-            DatabaseLogger.log("INFO", "New user registered", email);
-            showAlert("✅ Registration successful!\nYour University ID is: " + generatedId);
+        if (generatedId != null) {
+            Clipboard clipboard = Clipboard.getSystemClipboard();
+            ClipboardContent clipboardContent = new ClipboardContent();
+            clipboardContent.putString(generatedId);
+            clipboard.setContent(clipboardContent);
+            showAlert("✅ Registration successful!\nYour University ID is: " + generatedId + "\n(Your student ID has been copied to clipboard.)");
             // TODO: Redirect back to login screen
         } else {
-            logger.warning("Registration failed for: " + email);
-            DatabaseLogger.log("WARNING", "Registration failed", email);
             showAlert("❌ Registration failed. Email might already be taken.");
         }
     }

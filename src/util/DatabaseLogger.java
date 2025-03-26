@@ -9,7 +9,7 @@ import java.sql.SQLException;
 public class DatabaseLogger {
 
     public static void log(String level, String message, String email) {
-        String sql = "INSERT INTO logs (level, message, email) VALUES (?, ?, ?)";
+        String sql = "INSERT INTO logs (level, message, ip_address) VALUES (?, ?, ?)";
 
         try (Connection conn = DBConnection.getConnection();
              PreparedStatement stmt = conn.prepareStatement(sql)) {
