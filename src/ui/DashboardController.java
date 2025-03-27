@@ -114,6 +114,7 @@ public class DashboardController {
             FXMLLoader loader = new FXMLLoader(getClass().getResource("/view/Payment.fxml"));
             Parent root = loader.load();
             PaymentController controller = loader.getController();
+            // Pass the current student's ID from SessionManager
             controller.setStudentId(SessionManager.getStudentId());
             payTuitionButton.getScene().setRoot(root);
         } catch (Exception e) {
