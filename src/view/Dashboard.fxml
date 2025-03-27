@@ -18,11 +18,12 @@
     <Label fx:id="welcomeLabel" text="Welcome, User!" style="-fx-font-size: 18px;"/>
 
     <!-- Navigation buttons for various modules -->
-    <Button fx:id="courseManagementButton" text="Course Management" onAction="#handleCourseManagement"/>
     <Button fx:id="enrollmentButton" text="Enrollment" onAction="#handleEnrollment"/>
-    <Button fx:id="gradeManagementButton" text="Grade Management" onAction="#handleGradeManagement"/>
 
     <!-- Logout button -->
+    <Button fx:id="courseManagementButton" text="Course Management" onAction="#handleCourseManagement" />
+    <Button fx:id="gradeManagementButton" text="Grade Management" onAction="#handleGradeManagement"/>
+
     <Button fx:id="logoutButton" text="Logout" onAction="#handleLogout"/>
 
     <Button fx:id="transcriptButton" onAction="#handleTranscript" text="Transcript" />

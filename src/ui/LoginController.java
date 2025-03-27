@@ -8,6 +8,7 @@ import model.User;
 import service.AuthService;
 import util.DatabaseLogger;
 import java.net.InetAddress;
+import util.SessionManager;
 import java.net.UnknownHostException;
 
 /**
@@ -49,16 +50,15 @@ public class LoginController {
             failedLoginAttempts = 0;
 
             try {
+                // 🧠 Store logged-in user in session
+                SessionManager.setCurrentUser(user.getName(), user.getRole(), user.getId());
+
                 javafx.fxml.FXMLLoader loader = new javafx.fxml.FXMLLoader(getClass().getResource("/view/dashboard.fxml"));
                 javafx.scene.Parent root = loader.load();
 
-                // Securely pass user details to Dashboard
+                // You can still pass directly to controller, or let DashboardController pull from session
                 DashboardController controller = loader.getController();
-                controller.setCurrentUser(
-                        user.getName(),
-                        user.getRole(),     // role needed to control access
-                        user.getId()        // studentId needed for enrollment/payment
-                );
+                controller.setCurrentUser(user.getName(), user.getRole(), user.getId());
 
                 studentIdField.getScene().setRoot(root);
 

@@ -6,6 +6,7 @@ import javafx.scene.Parent;
 import javafx.scene.control.Alert;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
+import util.SessionManager;
 
 /**
  * DashboardController handles the main menu/dashboard screen.
@@ -26,13 +27,20 @@ public class DashboardController {
     private Button payTuitionButton;
     @FXML
     private Button logoutButton;
-
+    @FXML
+    private Button gradeManagementButton;
     private String currentUserName;
     private String currentUserRole; // e.g., "student", "instructor", or "admin"
     private String currentStudentId; // only used for student-specific screens
 
     public void initialize() {
-        if (currentUserName == null) currentUserName = "User";
+        // Pull from SessionManager if values were not passed directly
+        if (currentUserName == null) {
+            currentUserName = SessionManager.getUserName();
+            currentUserRole = SessionManager.getUserRole();
+            currentStudentId = SessionManager.getStudentId();
+        }
+
         welcomeLabel.setText("Welcome, " + currentUserName + "!");
 
         // Hide all role-specific buttons by default
@@ -40,12 +48,30 @@ public class DashboardController {
         enrollmentButton.setVisible(false);
         transcriptButton.setVisible(false);
         payTuitionButton.setVisible(false);
-    }
 
+        // Show buttons based on role
+        if (currentUserRole != null) {
+            switch (currentUserRole.toLowerCase()) {
+                case "student":
+                    enrollmentButton.setVisible(true);
+                    transcriptButton.setVisible(true);
+                    payTuitionButton.setVisible(true);
+                    break;
+                case "instructor":
+                case "admin":
+                    courseManagementButton.setVisible(true);
+                    break;
+            }
+        }
+    }
     public void setCurrentUser(String userName, String userRole, String studentId) {
         this.currentUserName = userName;
         this.currentUserRole = userRole;
         this.currentStudentId = studentId;
+
+        // Store in SessionManager for access after going back
+        SessionManager.setCurrentUser(userName, userRole, studentId);
+
         welcomeLabel.setText("Welcome, " + currentUserName + "!");
 
         // Show buttons based on role
@@ -147,7 +173,18 @@ public class DashboardController {
     }
     @FXML
     private void handleGradeManagement() {
-        // You can replace this with a real implementation later
-        showAlert("Grade Management module is not yet implemented.");
+        try {
+            FXMLLoader loader = new FXMLLoader(getClass().getResource("/view/GradeManagement.fxml"));
+            Parent root = loader.load();
+
+            GradeManagementController controller = loader.getController();
+            controller.setInstructorName(SessionManager.getUserName());
+
+            gradeManagementButton.getScene().setRoot(root);
+        } catch (Exception e) {
+            e.printStackTrace();
+            showAlert("Error loading Grade Management.");
+        }
     }
+
 }

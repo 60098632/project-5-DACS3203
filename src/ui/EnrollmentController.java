@@ -2,81 +2,85 @@ package ui;
 
 import config.DBConnection;
 import javafx.fxml.FXML;
+import javafx.fxml.FXMLLoader;
+import javafx.scene.Parent;
 import javafx.scene.control.Alert;
 import javafx.scene.control.Button;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
+import javafx.scene.control.cell.PropertyValueFactory;
+import javafx.scene.Scene;
+import javafx.stage.Stage;
 import model.Course;
 import java.sql.*;
 import java.util.logging.Logger;
 
-/**
- * EnrollmentController manages the enrollment process for a student.
- * It loads available courses from the database and the courses in which the student is already enrolled.
- * The module uses prepared statements to prevent SQL injection and validates the student session.
- */
 public class EnrollmentController {
 
-    // TableView for displaying available courses
     @FXML
     private TableView<Course> availableCoursesTable;
-
-    // TableColumns for available courses
     @FXML
     private TableColumn<Course, String> availableCourseCodeColumn;
     @FXML
     private TableColumn<Course, String> availableCourseNameColumn;
     @FXML
+    private TableColumn<Course, Integer> availableCreditHoursColumn;
+    @FXML
     private TableColumn<Course, String> availableCourseDescriptionColumn;
+    @FXML
+    private TableColumn<Course, String> availableInstructorColumn;
 
-    // TableView for displaying courses the student is enrolled in
     @FXML
     private TableView<Course> enrolledCoursesTable;
-
-    // TableColumns for enrolled courses
     @FXML
     private TableColumn<Course, String> enrolledCourseCodeColumn;
     @FXML
     private TableColumn<Course, String> enrolledCourseNameColumn;
     @FXML
+    private TableColumn<Course, Integer> enrolledCreditHoursColumn;
+    @FXML
     private TableColumn<Course, String> enrolledCourseDescriptionColumn;
+    @FXML
+    private TableColumn<Course, String> enrolledInstructorColumn;
 
-    // Buttons for enrollment actions
     @FXML
     private Button enrollButton;
     @FXML
     private Button dropButton;
+    @FXML
+    private Button goBackButton;
 
-    // The logged-in student's ID; this must be set after a successful login
     private String studentId;
-
-    // Logger for logging enrollment events
+    private String userName;
+    private String userRole;
+    @FXML
+    private Button gradeManagementButton;
     private static final Logger logger = Logger.getLogger(EnrollmentController.class.getName());
 
-    /**
-     * Called automatically when the FXML is loaded.
-     * Loads available courses and the student's current enrollments.
-     */
     @FXML
     public void initialize() {
+        availableCourseCodeColumn.setCellValueFactory(new PropertyValueFactory<>("courseCode"));
+        availableCourseNameColumn.setCellValueFactory(new PropertyValueFactory<>("courseName"));
+        availableCreditHoursColumn.setCellValueFactory(new PropertyValueFactory<>("creditHours"));
+        availableCourseDescriptionColumn.setCellValueFactory(new PropertyValueFactory<>("courseDescription"));
+        availableInstructorColumn.setCellValueFactory(new PropertyValueFactory<>("instructorName"));
+
+        enrolledCourseCodeColumn.setCellValueFactory(new PropertyValueFactory<>("courseCode"));
+        enrolledCourseNameColumn.setCellValueFactory(new PropertyValueFactory<>("courseName"));
+        enrolledCreditHoursColumn.setCellValueFactory(new PropertyValueFactory<>("creditHours"));
+        enrolledCourseDescriptionColumn.setCellValueFactory(new PropertyValueFactory<>("courseDescription"));
+        enrolledInstructorColumn.setCellValueFactory(new PropertyValueFactory<>("instructorName"));
+
         loadAvailableCourses();
+    }
+
+    public void setCurrentUser(String name, String role, String id) {
+        this.userName = name;
+        this.userRole = role;
+        this.studentId = id;
         loadEnrolledCourses();
     }
 
-    /**
-     * Sets the logged-in student's ID.
-     * This method should be called from the DashboardController after login.
-     * @param studentId The current student's ID.
-     */
-    public void setStudentId(String studentId) {
-        this.studentId = studentId;
-        // Refresh enrolled courses after setting the student ID.
-        loadEnrolledCourses();
-    }
-
-    /**
-     * Loads all available courses from the "courses" table and displays them in the availableCoursesTable.
-     */
     private void loadAvailableCourses() {
         String sql = "SELECT * FROM courses";
         try (Connection conn = DBConnection.getConnection();
@@ -84,73 +88,61 @@ public class EnrollmentController {
              ResultSet rs = stmt.executeQuery(sql)) {
 
             availableCoursesTable.getItems().clear();
-
-            while(rs.next()) {
-                // Updated constructor: course_code, course_name, credit_hours, instructor_name
+            while (rs.next()) {
                 Course course = new Course(
                         rs.getString("course_code"),
                         rs.getString("course_name"),
                         rs.getInt("credit_hours"),
                         rs.getString("instructor_name"),
                         rs.getString("course_description")
-
                 );
                 availableCoursesTable.getItems().add(course);
             }
         } catch (SQLException e) {
             logger.severe("Error loading available courses: " + e.getMessage());
-            showAlert("Error loading available courses from the database.");
+            showAlert("Error loading available courses.");
         }
     }
 
-    /**
-     * Loads the courses the current student is enrolled in from the "enrollments" table.
-     * This query uses a join between the "courses" and "enrollments" tables.
-     */
     private void loadEnrolledCourses() {
-        // Check if the studentId has been set.
-        if(studentId == null || studentId.isEmpty()) {
-            return;
-        }
-        String sql = "SELECT c.* FROM courses c INNER JOIN enrollments e ON c.course_code = e.course_code WHERE e.student_id = ?";
+        if (studentId == null || studentId.isEmpty()) return;
+
+        String sql = "SELECT c.* FROM courses c " +
+                "JOIN enrollments e ON c.course_code = e.course_code " +
+                "WHERE e.student_id = ?";
         try (Connection conn = DBConnection.getConnection();
              PreparedStatement stmt = conn.prepareStatement(sql)) {
 
             stmt.setString(1, studentId);
-            try (ResultSet rs = stmt.executeQuery()) {
-                enrolledCoursesTable.getItems().clear();
-                while(rs.next()) {
-                    // Updated constructor to include credit_hours and instructor_name
-                    Course course = new Course(
-                            rs.getString("course_code"),
-                            rs.getString("course_name"),
-                            rs.getInt("credit_hours"),
-                            rs.getString("instructor_name"),
-                            rs.getString("course_description")
+            ResultSet rs = stmt.executeQuery();
 
-                    );
-                    enrolledCoursesTable.getItems().add(course);
-                }
+            enrolledCoursesTable.getItems().clear();
+            while (rs.next()) {
+                Course course = new Course(
+                        rs.getString("course_code"),
+                        rs.getString("course_name"),
+                        rs.getInt("credit_hours"),
+                        rs.getString("instructor_name"),
+                        rs.getString("course_description")
+                );
+                enrolledCoursesTable.getItems().add(course);
             }
         } catch (SQLException e) {
             logger.severe("Error loading enrolled courses: " + e.getMessage());
-            showAlert("Error loading your enrolled courses.");
+            showAlert("Error loading enrolled courses.");
         }
     }
 
-    /**
-     * Handles enrolling the student in the selected course from the availableCoursesTable.
-     * Inserts a new record into the "enrollments" table.
-     */
     @FXML
     private void handleEnroll() {
         Course selected = availableCoursesTable.getSelectionModel().getSelectedItem();
-        if(selected == null) {
-            showAlert("Please select a course to enroll.");
+        if (selected == null) {
+            showAlert("Please select a course.");
             return;
         }
-        if(studentId == null || studentId.isEmpty()) {
-            showAlert("Student ID not set. Please log in again.");
+
+        if (studentId == null || studentId.isEmpty()) {
+            showAlert("No student ID. Please log in again.");
             return;
         }
 
@@ -162,31 +154,23 @@ public class EnrollmentController {
             stmt.setString(2, selected.getCourseCode());
 
             int rows = stmt.executeUpdate();
-            if(rows > 0) {
-                showAlert("Enrolled in course successfully.");
+            if (rows > 0) {
+                showAlert("Enrollment successful.");
                 loadEnrolledCourses();
             } else {
-                showAlert("Failed to enroll in course.");
+                showAlert("Failed to enroll.");
             }
         } catch (SQLException e) {
-            logger.severe("Error enrolling in course: " + e.getMessage());
-            showAlert("Error enrolling in the course.");
+            logger.severe("Enrollment error: " + e.getMessage());
+            showAlert("Error enrolling in course.");
         }
     }
 
-    /**
-     * Handles dropping an enrollment for the selected course from the enrolledCoursesTable.
-     * Deletes the corresponding record from the "enrollments" table.
-     */
     @FXML
     private void handleDropEnrollment() {
         Course selected = enrolledCoursesTable.getSelectionModel().getSelectedItem();
-        if(selected == null) {
-            showAlert("Please select a course to drop.");
-            return;
-        }
-        if(studentId == null || studentId.isEmpty()) {
-            showAlert("Student ID not set. Please log in again.");
+        if (selected == null) {
+            showAlert("Select a course to drop.");
             return;
         }
 
@@ -198,26 +182,42 @@ public class EnrollmentController {
             stmt.setString(2, selected.getCourseCode());
 
             int rows = stmt.executeUpdate();
-            if(rows > 0) {
-                showAlert("Dropped enrollment successfully.");
+            if (rows > 0) {
+                showAlert("Dropped course.");
                 loadEnrolledCourses();
             } else {
-                showAlert("Failed to drop enrollment.");
+                showAlert("Failed to drop course.");
             }
         } catch (SQLException e) {
-            logger.severe("Error dropping enrollment: " + e.getMessage());
-            showAlert("Error dropping the enrollment from the database.");
+            logger.severe("Drop error: " + e.getMessage());
+            showAlert("Error dropping course.");
         }
     }
 
-    /**
-     * Utility method to display an informational alert.
-     * @param message The message to display.
-     */
+    @FXML
+    private void handleGoBack() {
+        try {
+            FXMLLoader loader = new FXMLLoader(getClass().getResource("/view/Dashboard.fxml"));
+            Parent root = loader.load();
+
+            DashboardController controller = loader.getController();
+            controller.setCurrentUser("User", "student", studentId); // TODO: Replace "User" and "student" with actual values if you have them saved
+
+            goBackButton.getScene().setRoot(root);
+        } catch (Exception e) {
+            logger.severe("Failed to go back: " + e.getMessage());
+            showAlert("Unable to return to dashboard.");
+        }
+    }
+
     private void showAlert(String message) {
         Alert alert = new Alert(Alert.AlertType.INFORMATION);
         alert.setHeaderText(null);
         alert.setContentText(message);
         alert.showAndWait();
+    }
+    public void setStudentId(String studentId) {
+        this.studentId = studentId;
+        loadEnrolledCourses();
     }
 }

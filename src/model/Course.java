@@ -5,7 +5,7 @@ public class Course {
     private String courseName;
     private int creditHours;
     private String instructorName;
-    private String courseDescription; // NEW FIELD
+    private String courseDescription;
 
     public Course(String courseCode, String courseName, int creditHours, String instructorName, String courseDescription) {
         this.courseCode = courseCode;
@@ -18,6 +18,7 @@ public class Course {
     public String getCourseCode() {
         return courseCode;
     }
+
     public void setCourseCode(String courseCode) {
         this.courseCode = courseCode;
     }
@@ -25,6 +26,7 @@ public class Course {
     public String getCourseName() {
         return courseName;
     }
+
     public void setCourseName(String courseName) {
         this.courseName = courseName;
     }
@@ -32,6 +34,7 @@ public class Course {
     public int getCreditHours() {
         return creditHours;
     }
+
     public void setCreditHours(int creditHours) {
         this.creditHours = creditHours;
     }
@@ -39,6 +42,7 @@ public class Course {
     public String getInstructorName() {
         return instructorName;
     }
+
     public void setInstructorName(String instructorName) {
         this.instructorName = instructorName;
     }
@@ -46,6 +50,7 @@ public class Course {
     public String getCourseDescription() {
         return courseDescription;
     }
+
     public void setCourseDescription(String courseDescription) {
         this.courseDescription = courseDescription;
     }

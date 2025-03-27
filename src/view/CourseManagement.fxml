@@ -1,41 +1,51 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
 <?import javafx.scene.control.*?>
-<?import javafx.scene.layout.VBox?>
-<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.*?>
 
-<!--
-    StudentCourseRegistration.fxml
-    Displays two TableViews:
-    1) Available Courses
-    2) Courses the student is enrolled in
+<VBox xmlns:fx="http://javafx.com/fxml" fx:controller="ui.CourseManagementController"
+      spacing="15" style="-fx-padding: 20;">
 
-    Includes buttons for 'Register' and 'Drop'.
--->
-<VBox xmlns:fx="http://javafx.com/fxml" fx:controller="ui.StudentCourseRegistrationController"
-      spacing="10" style="-fx-padding: 20;">
-
-    <!-- Available Courses Section -->
-    <Label text="Available Courses" style="-fx-font-size: 16px;"/>
-    <TableView fx:id="availableCoursesTable">
+    <!-- Table of courses -->
+    <Label text="All Courses:" style="-fx-font-size: 16px;"/>
+    <TableView fx:id="courseTable" prefHeight="200">
         <columns>
-            <TableColumn fx:id="availableCourseCodeCol" text="Code" prefWidth="80"/>
-            <TableColumn fx:id="availableCourseNameCol" text="Name" prefWidth="120"/>
-            <TableColumn fx:id="availableCreditHoursCol" text="Credits" prefWidth="60"/>
-            <TableColumn fx:id="availableInstructorCol" text="Instructor" prefWidth="100"/>
+            <TableColumn fx:id="courseCodeColumn" text="Course Code" prefWidth="100"/>
+            <TableColumn fx:id="courseNameColumn" text="Course Name" prefWidth="150"/>
+            <TableColumn fx:id="creditHoursColumn" text="Credit Hours" prefWidth="100"/>
+            <TableColumn fx:id="descriptionColumn" text="Description" prefWidth="200"/>
+            <TableColumn fx:id="instructorColumn" text="Instructor" prefWidth="150"/>
         </columns>
     </TableView>
-    <Button fx:id="registerButton" text="Register for Selected Course" onAction="#handleRegister"/>
 
-    <!-- Enrolled Courses Section -->
-    <Label text="My Enrolled Courses" style="-fx-font-size: 16px;"/>
-    <TableView fx:id="enrolledCoursesTable">
-        <columns>
-            <TableColumn fx:id="enrolledCourseCodeCol" text="Code" prefWidth="80"/>
-            <TableColumn fx:id="enrolledCourseNameCol" text="Name" prefWidth="120"/>
-            <TableColumn fx:id="enrolledCreditHoursCol" text="Credits" prefWidth="60"/>
-            <TableColumn fx:id="enrolledInstructorCol" text="Instructor" prefWidth="100"/>
-        </columns>
-    </TableView>
-    <Button fx:id="dropButton" text="Drop Selected Course" onAction="#handleDrop"/>
+    <!-- Form to add a new course -->
+    <Label text="Add New Course:" style="-fx-font-size: 16px;"/>
+    <GridPane hgap="10" vgap="10">
+        <columnConstraints>
+            <ColumnConstraints percentWidth="20"/>
+            <ColumnConstraints percentWidth="80"/>
+        </columnConstraints>
+
+        <Label text="Course Code:" GridPane.rowIndex="0" GridPane.columnIndex="0"/>
+        <TextField fx:id="courseCodeField" GridPane.rowIndex="0" GridPane.columnIndex="1"/>
+
+        <Label text="Course Name:" GridPane.rowIndex="1" GridPane.columnIndex="0"/>
+        <TextField fx:id="courseNameField" GridPane.rowIndex="1" GridPane.columnIndex="1"/>
+
+        <Label text="Credit Hours:" GridPane.rowIndex="2" GridPane.columnIndex="0"/>
+        <TextField fx:id="creditHoursField" GridPane.rowIndex="2" GridPane.columnIndex="1"/>
+
+        <Label text="Instructor:" GridPane.rowIndex="3" GridPane.columnIndex="0"/>
+        <TextField fx:id="instructorField" GridPane.rowIndex="3" GridPane.columnIndex="1"/>
+
+        <Label text="Description:" GridPane.rowIndex="4" GridPane.columnIndex="0"/>
+        <TextArea fx:id="descriptionField" GridPane.rowIndex="4" GridPane.columnIndex="1" prefRowCount="3"/>
+    </GridPane>
+
+    <!-- Action buttons -->
+    <HBox spacing="10">
+        <Button text="Add Course" onAction="#handleAddCourse"/>
+        <Button text="Delete Selected" onAction="#handleDeleteCourse"/>
+        <Button text="Go Back" onAction="#handleGoBack" fx:id="goBackButton"/>
+    </HBox>
 </VBox>

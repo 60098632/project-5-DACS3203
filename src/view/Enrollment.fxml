@@ -4,33 +4,34 @@
 <?import javafx.scene.layout.VBox?>
 <?import javafx.scene.layout.HBox?>
 
-<!--
-    Enrollment.fxml defines the UI for the Enrollment module.
-    It includes two sections: one for available courses and one for the courses in which the student is enrolled.
-    Security Note: All database interactions use prepared statements.
--->
 <VBox xmlns:fx="http://javafx.com/fxml" fx:controller="ui.EnrollmentController"
       spacing="10" style="-fx-padding: 20;">
 
-    <!-- Section for available courses -->
     <Label text="Available Courses:" style="-fx-font-size: 16px;"/>
     <TableView fx:id="availableCoursesTable">
         <columns>
             <TableColumn fx:id="availableCourseCodeColumn" text="Course Code" prefWidth="100"/>
             <TableColumn fx:id="availableCourseNameColumn" text="Course Name" prefWidth="150"/>
+            <TableColumn fx:id="availableCreditHoursColumn" text="Credit Hour" prefWidth="80"/>
             <TableColumn fx:id="availableCourseDescriptionColumn" text="Description" prefWidth="200"/>
+            <TableColumn fx:id="availableInstructorColumn" text="Instructor" prefWidth="120"/>
         </columns>
     </TableView>
     <Button fx:id="enrollButton" text="Enroll in Selected Course" onAction="#handleEnroll"/>
 
-    <!-- Section for enrolled courses -->
     <Label text="My Enrollments:" style="-fx-font-size: 16px;"/>
     <TableView fx:id="enrolledCoursesTable">
         <columns>
             <TableColumn fx:id="enrolledCourseCodeColumn" text="Course Code" prefWidth="100"/>
             <TableColumn fx:id="enrolledCourseNameColumn" text="Course Name" prefWidth="150"/>
+            <TableColumn fx:id="enrolledCreditHoursColumn" text="Credit Hour" prefWidth="80"/>
             <TableColumn fx:id="enrolledCourseDescriptionColumn" text="Description" prefWidth="200"/>
+            <TableColumn fx:id="enrolledInstructorColumn" text="Instructor" prefWidth="120"/>
         </columns>
     </TableView>
-    <Button fx:id="dropButton" text="Drop Selected Course" onAction="#handleDropEnrollment"/>
+
+    <HBox spacing="10">
+        <Button fx:id="dropButton" text="Drop Selected Course" onAction="#handleDropEnrollment"/>
+        <Button fx:id="goBackButton" text="Go Back" onAction="#handleGoBack"/>
+    </HBox>
 </VBox>
