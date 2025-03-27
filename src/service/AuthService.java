@@ -51,7 +51,8 @@ public class AuthService {
      * Registers a new user (as student) with salted & hashed password.
      * @return the generated university ID if successful, or null if failed.
      */
-    public static String register(String name, String email, String password) {
+
+    public static String register(String name, String email, String password, String role) {
         String sql = "INSERT INTO users (id, name, email, password, salt, role) VALUES (?, ?, ?, ?, ?, ?)";
         String universityId = generateUniversityId();
         String salt = generateSalt();
@@ -63,7 +64,7 @@ public class AuthService {
             stmt.setString(3, email);
             stmt.setString(4, hashed);
             stmt.setString(5, salt);
-            stmt.setString(6, "student");  // default role
+            stmt.setString(6, role);  // Pass the role value here
             stmt.executeUpdate();
             return universityId;
         } catch (SQLIntegrityConstraintViolationException e) {

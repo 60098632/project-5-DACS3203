@@ -2,6 +2,7 @@ package ui;
 
 import javafx.fxml.FXML;
 import javafx.scene.control.Alert;
+import javafx.scene.control.ComboBox;
 import javafx.scene.control.PasswordField;
 import javafx.scene.control.TextField;
 import service.AuthService;
@@ -14,6 +15,14 @@ public class RegisterController {
     @FXML private TextField emailField;
     @FXML private PasswordField passwordField;
     @FXML private PasswordField confirmPasswordField;
+    @FXML private ComboBox<String> roleComboBox;  // Added ComboBox for role selection
+
+    @FXML
+    public void initialize() {
+        // Initialize the role ComboBox with options
+        roleComboBox.getItems().addAll("Student", "Instructor");
+        roleComboBox.setValue("Student");  // Default selection
+    }
 
     @FXML
     private void handleRegister() {
@@ -21,6 +30,8 @@ public class RegisterController {
         String email = emailField.getText().trim();
         String password = passwordField.getText();
         String confirmPassword = confirmPasswordField.getText();
+        // Retrieve the selected role and convert to lowercase for consistency
+        String role = roleComboBox.getValue().toLowerCase();
 
         Pattern namePattern = Pattern.compile("^[A-Za-z ]{3,}$");
         Pattern emailPattern = Pattern.compile("^[\\w.-]+@[\\w.-]+\\.[A-Za-z]{2,}$");
@@ -47,16 +58,17 @@ public class RegisterController {
             return;
         }
 
-        String generatedId = AuthService.register(name, email, password);
+        // Pass the role to the registration method
+        String generatedId = AuthService.register(name, email, password, role);
         if (generatedId != null) {
-            // Copy assigned student ID to clipboard and inform the user
+            // Copy assigned university ID to clipboard and inform the user
             Clipboard clipboard = Clipboard.getSystemClipboard();
             ClipboardContent content = new ClipboardContent();
             content.putString(generatedId);
             clipboard.setContent(content);
             showAlert("✅ Registration successful!\nYour University ID is: " + generatedId +
                     "\n(It has been copied to the clipboard.)");
-            goToLogin();  // redirect to login on success
+            goToLogin();  // Redirect to login on success
         } else {
             showAlert("❌ Registration failed. The email might already be taken.");
         }
