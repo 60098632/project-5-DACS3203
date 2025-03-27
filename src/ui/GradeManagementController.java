@@ -73,13 +73,14 @@ public class GradeManagementController {
             ResultSet rs = stmt.executeQuery();
 
             while (rs.next()) {
-                enrollments.add(new Enrollment(
-                        rs.getInt("enrollment_id"),
+                Enrollment enrollment = new Enrollment(
                         rs.getString("student_id"),
                         rs.getString("course_code"),
                         rs.getString("semester"),
                         rs.getString("grade")
-                ));
+                );
+                enrollment.setEnrollmentId(rs.getInt("enrollment_id"));
+                enrollments.add(enrollment);
             }
 
             gradeTable.setItems(enrollments);

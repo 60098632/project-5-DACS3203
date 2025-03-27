@@ -4,57 +4,33 @@ import config.DBConnection;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
-import javafx.scene.control.Alert;
-import javafx.scene.control.Button;
-import javafx.scene.control.TableColumn;
-import javafx.scene.control.TableView;
+import javafx.scene.control.*;
 import javafx.scene.control.cell.PropertyValueFactory;
-import javafx.scene.Scene;
-import javafx.stage.Stage;
 import model.Course;
+import util.SessionManager;
 import java.sql.*;
 import java.util.logging.Logger;
 
 public class EnrollmentController {
 
-    @FXML
-    private TableView<Course> availableCoursesTable;
-    @FXML
-    private TableColumn<Course, String> availableCourseCodeColumn;
-    @FXML
-    private TableColumn<Course, String> availableCourseNameColumn;
-    @FXML
-    private TableColumn<Course, Integer> availableCreditHoursColumn;
-    @FXML
-    private TableColumn<Course, String> availableCourseDescriptionColumn;
-    @FXML
-    private TableColumn<Course, String> availableInstructorColumn;
+    @FXML private TableView<Course> availableCoursesTable;
+    @FXML private TableColumn<Course, String> availableCourseCodeColumn;
+    @FXML private TableColumn<Course, String> availableCourseNameColumn;
+    @FXML private TableColumn<Course, Integer> availableCreditHoursColumn;
+    @FXML private TableColumn<Course, String> availableCourseDescriptionColumn;
+    @FXML private TableColumn<Course, String> availableInstructorColumn;
 
-    @FXML
-    private TableView<Course> enrolledCoursesTable;
-    @FXML
-    private TableColumn<Course, String> enrolledCourseCodeColumn;
-    @FXML
-    private TableColumn<Course, String> enrolledCourseNameColumn;
-    @FXML
-    private TableColumn<Course, Integer> enrolledCreditHoursColumn;
-    @FXML
-    private TableColumn<Course, String> enrolledCourseDescriptionColumn;
-    @FXML
-    private TableColumn<Course, String> enrolledInstructorColumn;
+    @FXML private TableView<Course> enrolledCoursesTable;
+    @FXML private TableColumn<Course, String> enrolledCourseCodeColumn;
+    @FXML private TableColumn<Course, String> enrolledCourseNameColumn;
+    @FXML private TableColumn<Course, Integer> enrolledCreditHoursColumn;
+    @FXML private TableColumn<Course, String> enrolledCourseDescriptionColumn;
+    @FXML private TableColumn<Course, String> enrolledInstructorColumn;
 
-    @FXML
-    private Button enrollButton;
-    @FXML
-    private Button dropButton;
-    @FXML
-    private Button goBackButton;
+    @FXML private Button enrollButton;
+    @FXML private Button dropButton;
+    @FXML private Button goBackButton;
 
-    private String studentId;
-    private String userName;
-    private String userRole;
-    @FXML
-    private Button gradeManagementButton;
     private static final Logger logger = Logger.getLogger(EnrollmentController.class.getName());
 
     @FXML
@@ -74,10 +50,16 @@ public class EnrollmentController {
         loadAvailableCourses();
     }
 
+    // Called after login to update the session.
     public void setCurrentUser(String name, String role, String id) {
-        this.userName = name;
-        this.userRole = role;
-        this.studentId = id;
+        SessionManager.setCurrentUser(name, role, id);
+        loadEnrolledCourses();
+    }
+
+    // Added setter to allow DashboardController to set the student ID without needing to pass all details.
+    public void setStudentId(String studentId) {
+        // Optionally, update the session if needed.
+        SessionManager.setCurrentUser(SessionManager.getUserName(), SessionManager.getUserRole(), studentId);
         loadEnrolledCourses();
     }
 
@@ -105,11 +87,10 @@ public class EnrollmentController {
     }
 
     private void loadEnrolledCourses() {
+        String studentId = SessionManager.getStudentId();
         if (studentId == null || studentId.isEmpty()) return;
 
-        String sql = "SELECT c.* FROM courses c " +
-                "JOIN enrollments e ON c.course_code = e.course_code " +
-                "WHERE e.student_id = ?";
+        String sql = "SELECT c.* FROM courses c JOIN enrollments e ON c.course_code = e.course_code WHERE e.student_id = ?";
         try (Connection conn = DBConnection.getConnection();
              PreparedStatement stmt = conn.prepareStatement(sql)) {
 
@@ -141,11 +122,46 @@ public class EnrollmentController {
             return;
         }
 
+        String studentId = SessionManager.getStudentId();
         if (studentId == null || studentId.isEmpty()) {
             showAlert("No student ID. Please log in again.");
             return;
         }
 
+        // Duplicate enrollment check
+        String dupCheckSql = "SELECT 1 FROM enrollments WHERE student_id = ? AND course_code = ?";
+        try (Connection conn = DBConnection.getConnection();
+             PreparedStatement ps = conn.prepareStatement(dupCheckSql)) {
+            ps.setString(1, studentId);
+            ps.setString(2, selected.getCourseCode());
+            ResultSet rs = ps.executeQuery();
+            if (rs.next()) {
+                showAlert("You are already enrolled in " + selected.getCourseName() + ".");
+                return;
+            }
+        } catch (SQLException e) {
+            logger.warning("Dup check failed: " + e.getMessage());
+        }
+
+        // Credit limit check
+        String sumSql = "SELECT SUM(c.credit_hours) AS total_credits FROM enrollments e JOIN courses c ON e.course_code = c.course_code WHERE e.student_id = ?";
+        try (Connection conn = DBConnection.getConnection();
+             PreparedStatement ps = conn.prepareStatement(sumSql)) {
+            ps.setString(1, studentId);
+            ResultSet rs = ps.executeQuery();
+            int currentCredits = 0;
+            if (rs.next()) {
+                currentCredits = rs.getInt("total_credits");
+            }
+            if (currentCredits + selected.getCreditHours() > 18) {
+                showAlert("Cannot enroll in " + selected.getCourseName() + " because it would exceed the 18-credit limit.");
+                return;
+            }
+        } catch (SQLException e) {
+            logger.warning("Failed to check credit total: " + e.getMessage());
+        }
+
+        // Insert enrollment record
         String sql = "INSERT INTO enrollments (student_id, course_code) VALUES (?, ?)";
         try (Connection conn = DBConnection.getConnection();
              PreparedStatement stmt = conn.prepareStatement(sql)) {
@@ -174,6 +190,7 @@ public class EnrollmentController {
             return;
         }
 
+        String studentId = SessionManager.getStudentId();
         String sql = "DELETE FROM enrollments WHERE student_id = ? AND course_code = ?";
         try (Connection conn = DBConnection.getConnection();
              PreparedStatement stmt = conn.prepareStatement(sql)) {
@@ -201,7 +218,8 @@ public class EnrollmentController {
             Parent root = loader.load();
 
             DashboardController controller = loader.getController();
-            controller.setCurrentUser("User", "student", studentId); // TODO: Replace "User" and "student" with actual values if you have them saved
+            // Use SessionManager for current session data
+            controller.setCurrentUser(SessionManager.getUserName(), SessionManager.getUserRole(), SessionManager.getStudentId());
 
             goBackButton.getScene().setRoot(root);
         } catch (Exception e) {
@@ -215,9 +233,5 @@ public class EnrollmentController {
         alert.setHeaderText(null);
         alert.setContentText(message);
         alert.showAndWait();
-    }
-    public void setStudentId(String studentId) {
-        this.studentId = studentId;
-        loadEnrolledCourses();
     }
 }

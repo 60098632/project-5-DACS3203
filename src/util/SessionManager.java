@@ -54,4 +54,5 @@ public class SessionManager {
         userRole = null;
         studentId = null;
     }
+
 }

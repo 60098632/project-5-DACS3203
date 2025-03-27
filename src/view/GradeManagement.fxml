@@ -1,33 +1,29 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<?import java.lang.*?>
-<?import java.util.*?>
-<?import javafx.scene.*?>
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
 
-<AnchorPane xmlns="http://javafx.com/javafx"
-            xmlns:fx="http://javafx.com/fxml"
-            fx:controller="<VBox xmlns:fx="http://javafx.com/fxml" fx:controller="ui.GradeManagementController"
-        spacing="15" alignment="CENTER" style="-fx-padding: 20;">
+<VBox xmlns="http://javafx.com/javafx/8"
+      xmlns:fx="http://javafx.com/fxml/1"
+      fx:controller="ui.GradeManagementController"
+      spacing="15" alignment="CENTER" style="-fx-padding:20;"
+      prefWidth="600" prefHeight="400">
+    <children>
+        <Label text="Grade Management" style="-fx-font-size:18px;"/>
 
-<Label text="Grade Management" style="-fx-font-size: 18px;"/>
+        <ComboBox fx:id="courseDropdown" promptText="Select Course"/>
 
-<ComboBox fx:id="courseDropdown" promptText="Select Course" />
+        <TableView fx:id="gradeTable" prefHeight="250">
+            <columns>
+                <TableColumn fx:id="studentIdColumn" text="Student ID" prefWidth="100"/>
+                <TableColumn fx:id="studentNameColumn" text="Name" prefWidth="150"/>
+                <TableColumn fx:id="gradeColumn" text="Grade" prefWidth="100"/>
+            </columns>
+        </TableView>
 
-<TableView fx:id="gradeTable" prefHeight="250">
-<columns>
-    <TableColumn fx:id="studentIdColumn" text="Student ID" prefWidth="100"/>
-    <TableColumn fx:id="studentNameColumn" text="Name" prefWidth="150"/>
-    <TableColumn fx:id="gradeColumn" text="Grade" prefWidth="100"/>
-</columns>
-</TableView>
-
-<HBox spacing="10">
-<Button text="Save Grades" onAction="#handleSaveGrades"/>
-<Button text="Back" onAction="#handleBack"/>
-</HBox>
-        </VBox>"
-            prefHeight="400.0" prefWidth="600.0">
-
-</AnchorPane>
+        <HBox spacing="10">
+            <Button text="Save Grades" onAction="#handleSaveGrades"/>
+            <Button text="Back"        onAction="#handleBack"/>
+        </HBox>
+    </children>
+</VBox>

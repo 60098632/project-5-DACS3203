@@ -8,7 +8,8 @@
       spacing="10" style="-fx-padding: 20;">
 
     <Label text="Available Courses:" style="-fx-font-size: 16px;"/>
-    <TableView fx:id="availableCoursesTable">
+
+    <TableView fx:id="availableCoursesTable" prefHeight="180">
         <columns>
             <TableColumn fx:id="availableCourseCodeColumn" text="Course Code" prefWidth="100"/>
             <TableColumn fx:id="availableCourseNameColumn" text="Course Name" prefWidth="150"/>
@@ -16,11 +17,16 @@
             <TableColumn fx:id="availableCourseDescriptionColumn" text="Description" prefWidth="200"/>
             <TableColumn fx:id="availableInstructorColumn" text="Instructor" prefWidth="120"/>
         </columns>
+        <placeholder>
+            <Label text="No courses available."/>
+        </placeholder>
     </TableView>
+
     <Button fx:id="enrollButton" text="Enroll in Selected Course" onAction="#handleEnroll"/>
 
     <Label text="My Enrollments:" style="-fx-font-size: 16px;"/>
-    <TableView fx:id="enrolledCoursesTable">
+
+    <TableView fx:id="enrolledCoursesTable" prefHeight="180">
         <columns>
             <TableColumn fx:id="enrolledCourseCodeColumn" text="Course Code" prefWidth="100"/>
             <TableColumn fx:id="enrolledCourseNameColumn" text="Course Name" prefWidth="150"/>
@@ -28,9 +34,12 @@
             <TableColumn fx:id="enrolledCourseDescriptionColumn" text="Description" prefWidth="200"/>
             <TableColumn fx:id="enrolledInstructorColumn" text="Instructor" prefWidth="120"/>
         </columns>
+        <placeholder>
+            <Label text="No courses enrolled."/>
+        </placeholder>
     </TableView>
 
-    <HBox spacing="10">
+    <HBox spacing="10" style="-fx-padding: 10 0 0 0;">
         <Button fx:id="dropButton" text="Drop Selected Course" onAction="#handleDropEnrollment"/>
         <Button fx:id="goBackButton" text="Go Back" onAction="#handleGoBack"/>
     </HBox>

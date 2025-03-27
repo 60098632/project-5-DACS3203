@@ -11,18 +11,10 @@ import service.AuthService;
 
 public class RegisterController {
 
-
-    @FXML
-    private TextField nameField;
-
-    @FXML
-    private TextField emailField;
-
-    @FXML
-    private PasswordField passwordField;
-
-    @FXML
-    private PasswordField confirmPasswordField;
+    @FXML private TextField nameField;
+    @FXML private TextField emailField;
+    @FXML private PasswordField passwordField;
+    @FXML private PasswordField confirmPasswordField;
 
     @FXML
     private void handleRegister() {
@@ -31,48 +23,42 @@ public class RegisterController {
         String password = passwordField.getText();
         String confirmPassword = confirmPasswordField.getText();
 
-        // Regex patterns for validation
         Pattern emailPattern = Pattern.compile("^[\\w.-]+@[\\w.-]+\\.[a-zA-Z]{2,}$");
-        Pattern namePattern = Pattern.compile("^[A-Za-z ]{3,}$"); // At least 3 characters
+        Pattern namePattern = Pattern.compile("^[A-Za-z ]{3,}$");
         Pattern passwordPattern = Pattern.compile("^(?=.*[0-9])(?=.*[a-zA-Z])(?=.*[!@#\\$%^&*]).{8,}$");
-
-        // Validate name
-        if (!namePattern.matcher(name).matches()) {
-            showAlert("Invalid name. Use at least 3 letters and only letters/spaces.");
-            return;
-        }
-
-        // Validate email
-        if (!emailPattern.matcher(email).matches()) {
-            showAlert("Invalid email format.");
-            return;
-        }
-
-        // Validate password strength
-        if (!passwordPattern.matcher(password).matches()) {
-            showAlert("Password must be at least 8 characters, include a number and a special character.");
-            return;
-        }
 
         if (name.isEmpty() || email.isEmpty() || password.isEmpty() || confirmPassword.isEmpty()) {
             showAlert("Please fill in all fields.");
             return;
         }
-
+        if (!namePattern.matcher(name).matches()) {
+            showAlert("Invalid name. Use at least 3 letters and only letters/spaces.");
+            return;
+        }
+        if (!emailPattern.matcher(email).matches()) {
+            showAlert("Invalid email format.");
+            return;
+        }
+        if (!passwordPattern.matcher(password).matches()) {
+            showAlert("Password must be at least 8 characters, include a number and a special character.");
+            return;
+        }
         if (!password.equals(confirmPassword)) {
             showAlert("Passwords do not match.");
             return;
         }
 
         String generatedId = AuthService.register(name, email, password);
-
         if (generatedId != null) {
             Clipboard clipboard = Clipboard.getSystemClipboard();
             ClipboardContent clipboardContent = new ClipboardContent();
             clipboardContent.putString(generatedId);
             clipboard.setContent(clipboardContent);
-            showAlert("✅ Registration successful!\nYour University ID is: " + generatedId + "\n(Your student ID has been copied to clipboard.)");
-            // TODO: Redirect back to login screen
+
+            showAlert("✅ Registration successful!\nYour University ID is: " + generatedId +
+                    "\n(Your student ID has been copied to clipboard.)");
+
+            goToLogin(); // ← Redirect on success
         } else {
             showAlert("❌ Registration failed. Email might already be taken.");
         }
@@ -84,6 +70,7 @@ public class RegisterController {
         alert.setContentText(message);
         alert.showAndWait();
     }
+
     @FXML
     private void goToLogin() {
         try {

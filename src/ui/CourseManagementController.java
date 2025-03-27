@@ -119,6 +119,29 @@ public class CourseManagementController {
             return;
         }
 
+        // Check if any students are enrolled in this course
+        String checkSql = "SELECT COUNT(*) FROM enrollments WHERE course_code = ?";
+        try (Connection conn = DBConnection.getConnection();
+             PreparedStatement ps = conn.prepareStatement(checkSql)) {
+            ps.setString(1, selected.getCourseCode());
+            ResultSet rs = ps.executeQuery();
+            if (rs.next() && rs.getInt(1) > 0) {
+                showAlert("Cannot delete course \"" + selected.getCourseName() + "\" because students are enrolled in it.");
+                return;
+            }
+        } catch (SQLException e) {
+            logger.warning("Enrollment check failed: " + e.getMessage());
+        }
+
+        // Confirm deletion
+        Alert confirm = new Alert(Alert.AlertType.CONFIRMATION, "Delete course \"" + selected.getCourseName() + "\"?", ButtonType.OK, ButtonType.CANCEL);
+        confirm.setHeaderText("Confirm Deletion");
+        confirm.showAndWait();
+        if (confirm.getResult() != ButtonType.OK) {
+            return;
+        }
+
+        // Proceed with deletion
         String sql = "DELETE FROM courses WHERE course_code = ?";
         try (Connection conn = DBConnection.getConnection();
              PreparedStatement stmt = conn.prepareStatement(sql)) {

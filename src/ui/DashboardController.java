@@ -8,10 +8,6 @@ import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import util.SessionManager;
 
-/**
- * DashboardController handles the main menu/dashboard screen.
- * It displays buttons based on the user's role (student/instructor/admin).
- */
 public class DashboardController {
 
     @FXML
@@ -29,27 +25,46 @@ public class DashboardController {
     private Button logoutButton;
     @FXML
     private Button gradeManagementButton;
-    private String currentUserName;
-    private String currentUserRole; // e.g., "student", "instructor", or "admin"
-    private String currentStudentId; // only used for student-specific screens
 
+    /**
+     * This method is called automatically after the FXML is loaded.
+     * It initializes the dashboard UI based on the current session.
+     */
     public void initialize() {
-        // Pull from SessionManager if values were not passed directly
-        if (currentUserName == null) {
-            currentUserName = SessionManager.getUserName();
-            currentUserRole = SessionManager.getUserRole();
-            currentStudentId = SessionManager.getStudentId();
+        // If session data exists in SessionManager, update the UI accordingly.
+        updateUI();
+    }
+
+    /**
+     * Sets the current user in the SessionManager and updates the UI.
+     * This method can be called from the login controller.
+     */
+    public void setCurrentUser(String userName, String userRole, String studentId) {
+        SessionManager.setCurrentUser(userName, userRole, studentId);
+        updateUI();
+    }
+
+    /**
+     * Updates the welcome label and button visibility based on the user's role.
+     */
+    private void updateUI() {
+        String currentUserName = SessionManager.getUserName();
+        String currentUserRole = SessionManager.getUserRole();
+
+        if (currentUserName != null) {
+            welcomeLabel.setText("Welcome, " + currentUserName + "!");
+        } else {
+            welcomeLabel.setText("Welcome!");
         }
 
-        welcomeLabel.setText("Welcome, " + currentUserName + "!");
-
-        // Hide all role-specific buttons by default
+        // Hide all role-specific buttons by default.
         courseManagementButton.setVisible(false);
         enrollmentButton.setVisible(false);
         transcriptButton.setVisible(false);
         payTuitionButton.setVisible(false);
+        gradeManagementButton.setVisible(false);
 
-        // Show buttons based on role
+        // Show buttons based on role.
         if (currentUserRole != null) {
             switch (currentUserRole.toLowerCase()) {
                 case "student":
@@ -60,41 +75,20 @@ public class DashboardController {
                 case "instructor":
                 case "admin":
                     courseManagementButton.setVisible(true);
+                    gradeManagementButton.setVisible(true);
                     break;
             }
-        }
-    }
-    public void setCurrentUser(String userName, String userRole, String studentId) {
-        this.currentUserName = userName;
-        this.currentUserRole = userRole;
-        this.currentStudentId = studentId;
-
-        // Store in SessionManager for access after going back
-        SessionManager.setCurrentUser(userName, userRole, studentId);
-
-        welcomeLabel.setText("Welcome, " + currentUserName + "!");
-
-        // Show buttons based on role
-        switch (userRole.toLowerCase()) {
-            case "student":
-                enrollmentButton.setVisible(true);
-                transcriptButton.setVisible(true);
-                payTuitionButton.setVisible(true);
-                break;
-            case "instructor":
-            case "admin":
-                courseManagementButton.setVisible(true);
-                break;
         }
     }
 
     @FXML
     private void handleCourseManagement() {
-        if (!"admin".equalsIgnoreCase(currentUserRole) && !"instructor".equalsIgnoreCase(currentUserRole)) {
+        // Only instructors and admins can access course management.
+        String role = SessionManager.getUserRole();
+        if (role == null || (!role.equalsIgnoreCase("admin") && !role.equalsIgnoreCase("instructor"))) {
             showAlert("Access denied: Course Management is only for instructors or admins.");
             return;
         }
-
         try {
             FXMLLoader loader = new FXMLLoader(getClass().getResource("/view/CourseManagement.fxml"));
             Parent root = loader.load();
@@ -110,10 +104,9 @@ public class DashboardController {
         try {
             FXMLLoader loader = new FXMLLoader(getClass().getResource("/view/Enrollment.fxml"));
             Parent root = loader.load();
-
+            // Use SessionManager to set the student ID for the enrollment screen.
             EnrollmentController controller = loader.getController();
-            controller.setStudentId(currentStudentId); // set student ID so enrolled courses are fetched
-
+            controller.setStudentId(SessionManager.getStudentId());
             enrollmentButton.getScene().setRoot(root);
         } catch (Exception e) {
             e.printStackTrace();
@@ -126,10 +119,8 @@ public class DashboardController {
         try {
             FXMLLoader loader = new FXMLLoader(getClass().getResource("/view/Transcript.fxml"));
             Parent root = loader.load();
-
             TranscriptController controller = loader.getController();
-            controller.setStudentId(currentStudentId);
-
+            controller.setStudentId(SessionManager.getStudentId());
             transcriptButton.getScene().setRoot(root);
         } catch (Exception e) {
             e.printStackTrace();
@@ -142,10 +133,8 @@ public class DashboardController {
         try {
             FXMLLoader loader = new FXMLLoader(getClass().getResource("/view/Payment.fxml"));
             Parent root = loader.load();
-
             PaymentController controller = loader.getController();
-            controller.setStudentId(currentStudentId);
-
+            controller.setStudentId(SessionManager.getStudentId());
             payTuitionButton.getScene().setRoot(root);
         } catch (Exception e) {
             e.printStackTrace();
@@ -156,6 +145,8 @@ public class DashboardController {
     @FXML
     private void handleLogout() {
         try {
+            // Clear the session data on logout.
+            SessionManager.clearSession();
             FXMLLoader loader = new FXMLLoader(getClass().getResource("/view/login.fxml"));
             Parent root = loader.load();
             logoutButton.getScene().setRoot(root);
@@ -165,21 +156,20 @@ public class DashboardController {
         }
     }
 
-    private void showAlert(String message) {
-        Alert alert = new Alert(Alert.AlertType.INFORMATION);
-        alert.setHeaderText(null);
-        alert.setContentText(message);
-        alert.showAndWait();
-    }
     @FXML
     private void handleGradeManagement() {
+        // Only instructors and admins can access grade management.
+        String role = SessionManager.getUserRole();
+        if (role == null || (!role.equalsIgnoreCase("admin") && !role.equalsIgnoreCase("instructor"))) {
+            showAlert("Access denied: Grade Management is only for instructors or admins.");
+            return;
+        }
         try {
             FXMLLoader loader = new FXMLLoader(getClass().getResource("/view/GradeManagement.fxml"));
             Parent root = loader.load();
-
             GradeManagementController controller = loader.getController();
+            // Pass the instructor's name if needed.
             controller.setInstructorName(SessionManager.getUserName());
-
             gradeManagementButton.getScene().setRoot(root);
         } catch (Exception e) {
             e.printStackTrace();
@@ -187,4 +177,13 @@ public class DashboardController {
         }
     }
 
+    /**
+     * Displays an alert with the provided message.
+     */
+    private void showAlert(String message) {
+        Alert alert = new Alert(Alert.AlertType.INFORMATION);
+        alert.setHeaderText(null);
+        alert.setContentText(message);
+        alert.showAndWait();
+    }
 }

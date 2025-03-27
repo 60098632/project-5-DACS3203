@@ -1,31 +1,19 @@
 <?xml version="1.0" encoding="UTF-8"?>
-
 <?import javafx.scene.control.Button?>
 <?import javafx.scene.control.Label?>
 <?import javafx.scene.layout.VBox?>
-<?import javafx.scene.control.*?>
-<?import javafx.scene.layout.*?>
-<?import javafx.geometry.*?>
 
-<!--
-    Dashboard.fxml defines the main menu for the Educational Course Management System.
-    This screen is only accessible by authenticated users.
-    It contains a welcome message and buttons to navigate to key modules.
--->
-<VBox xmlns:fx="http://javafx.com/fxml" fx:controller="ui.DashboardController"
-      alignment="CENTER" spacing="10" style="-fx-padding: 20;">
-    <!-- Welcome label that displays the current user's name -->
-    <Label fx:id="welcomeLabel" text="Welcome, User!" style="-fx-font-size: 18px;"/>
+<VBox xmlns="http://javafx.com/javafx/8"
+      xmlns:fx="http://javafx.com/fxml/1"
+      fx:controller="ui.DashboardController"
+      spacing="10" alignment="CENTER" style="-fx-padding:20;">
 
-    <!-- Navigation buttons for various modules -->
-    <Button fx:id="enrollmentButton" text="Enrollment" onAction="#handleEnrollment"/>
+    <Label fx:id="welcomeLabel" text="Welcome!"/>
 
-    <!-- Logout button -->
-    <Button fx:id="courseManagementButton" text="Course Management" onAction="#handleCourseManagement" />
+    <Button fx:id="courseManagementButton" text="Course Management" onAction="#handleCourseManagement"/>
     <Button fx:id="gradeManagementButton" text="Grade Management" onAction="#handleGradeManagement"/>
-
-    <Button fx:id="logoutButton" text="Logout" onAction="#handleLogout"/>
-
-    <Button fx:id="transcriptButton" onAction="#handleTranscript" text="Transcript" />
-    <Button fx:id="payTuitionButton" onAction="#handlePayTuition" text="Pay Tuition"/>
+    <Button fx:id="enrollmentButton"       text="Enrollment"        onAction="#handleEnrollment"/>
+    <Button fx:id="transcriptButton"       text="Transcript"        onAction="#handleTranscript"/>
+    <Button fx:id="payTuitionButton"       text="Pay Tuition"       onAction="#handlePayTuition"/>
+    <Button fx:id="logoutButton"           text="Logout"            onAction="#handleLogout"/>
 </VBox>
