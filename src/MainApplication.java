@@ -9,7 +9,6 @@ public class MainApplication extends Application {
     public void start(Stage primaryStage) throws Exception {
         // Load the login screen from FXML
         Parent root = FXMLLoader.load(getClass().getResource("/view/login.fxml"));
-
         primaryStage.setTitle("Secure Auth App");
         primaryStage.setScene(new Scene(root, 300, 250));
         primaryStage.show();

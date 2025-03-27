@@ -1,44 +1,31 @@
 <?xml version="1.0" encoding="UTF-8"?>
-
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
-
-<VBox xmlns="http://javafx.com/javafx/8"
-      xmlns:fx="http://javafx.com/fxml/1"
-      fx:controller="ui.EnrollmentController"
-      spacing="15"
-      style="-fx-padding:20;"
-      prefWidth="600"
-      prefHeight="600">
-
-    <!-- Available Courses -->
-    <Label text="Available Courses:" style="-fx-font-size:16px;"/>
-    <TableView fx:id="availableCoursesTable" prefHeight="200" VBox.vgrow="ALWAYS">
+<VBox xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1"
+      fx:controller="ui.CourseManagementController"
+      spacing="10" alignment="CENTER" style="-fx-padding: 20;">
+    <!-- Course Table -->
+    <TableView fx:id="courseTable" prefHeight="200" VBox.vgrow="ALWAYS">
         <columns>
-            <TableColumn fx:id="availableCourseCodeColumn" text="Course Code" prefWidth="100"/>
-            <TableColumn fx:id="availableCourseNameColumn" text="Course Name" prefWidth="150"/>
-            <TableColumn fx:id="availableCreditHoursColumn" text="Credit Hours" prefWidth="100"/>
-            <TableColumn fx:id="availableCourseDescriptionColumn" text="Description" prefWidth="200"/>
-            <TableColumn fx:id="availableInstructorColumn" text="Instructor" prefWidth="150"/>
+            <TableColumn fx:id="courseCodeColumn" text="Course Code" prefWidth="100"/>
+            <TableColumn fx:id="courseNameColumn" text="Course Name" prefWidth="150"/>
+            <TableColumn fx:id="creditHoursColumn" text="Credit Hours" prefWidth="100"/>
+            <TableColumn fx:id="instructorColumn" text="Instructor" prefWidth="150"/>
+            <TableColumn fx:id="descriptionColumn" text="Description" prefWidth="200"/>
         </columns>
     </TableView>
 
-    <!-- Enrolled Courses -->
-    <Label text="Enrolled Courses:" style="-fx-font-size:16px;"/>
-    <TableView fx:id="enrolledCoursesTable" prefHeight="200" VBox.vgrow="ALWAYS">
-        <columns>
-            <TableColumn fx:id="enrolledCourseCodeColumn" text="Course Code" prefWidth="100"/>
-            <TableColumn fx:id="enrolledCourseNameColumn" text="Course Name" prefWidth="150"/>
-            <TableColumn fx:id="enrolledCreditHoursColumn" text="Credit Hours" prefWidth="100"/>
-            <TableColumn fx:id="enrolledCourseDescriptionColumn" text="Description" prefWidth="200"/>
-            <TableColumn fx:id="enrolledInstructorColumn" text="Instructor" prefWidth="150"/>
-        </columns>
-    </TableView>
+    <!-- Input Fields for new course -->
+    <TextField fx:id="courseCodeField" promptText="Course Code"/>
+    <TextField fx:id="courseNameField" promptText="Course Name"/>
+    <TextField fx:id="creditHoursField" promptText="Credit Hours"/>
+    <TextField fx:id="instructorField" promptText="Instructor"/>
+    <TextArea fx:id="descriptionField" promptText="Description" prefHeight="60"/>
 
     <!-- Action buttons -->
-    <HBox spacing="10">
-        <Button text="Enroll in Course" onAction="#handleEnroll"/>
-        <Button text="Drop Enrollment" onAction="#handleDropEnrollment"/>
+    <HBox spacing="10" alignment="CENTER">
+        <Button fx:id="addButton" text="Add Course" onAction="#handleAddCourse"/>
+        <Button fx:id="deleteButton" text="Delete Course" onAction="#handleDeleteCourse"/>
         <Button fx:id="goBackButton" text="Go Back" onAction="#handleGoBack"/>
     </HBox>
 </VBox>

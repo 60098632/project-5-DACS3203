@@ -1,46 +1,34 @@
 <?xml version="1.0" encoding="UTF-8"?>
-
 <?import javafx.scene.control.*?>
-<?import javafx.scene.layout.VBox?>
-<?import javafx.scene.layout.HBox?>
-
-<VBox xmlns:fx="http://javafx.com/fxml" fx:controller="ui.EnrollmentController"
-      spacing="10" style="-fx-padding: 20;">
-
+<?import javafx.scene.layout.*?>
+<VBox xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1"
+      fx:controller="ui.EnrollmentController"
+      spacing="15" style="-fx-padding:20;">
     <Label text="Available Courses:" style="-fx-font-size: 16px;"/>
-
-    <TableView fx:id="availableCoursesTable" prefHeight="180">
+    <TableView fx:id="availableCoursesTable" prefHeight="200" VBox.vgrow="ALWAYS">
         <columns>
             <TableColumn fx:id="availableCourseCodeColumn" text="Course Code" prefWidth="100"/>
             <TableColumn fx:id="availableCourseNameColumn" text="Course Name" prefWidth="150"/>
-            <TableColumn fx:id="availableCreditHoursColumn" text="Credit Hour" prefWidth="80"/>
+            <TableColumn fx:id="availableCreditHoursColumn" text="Credit Hours" prefWidth="100"/>
             <TableColumn fx:id="availableCourseDescriptionColumn" text="Description" prefWidth="200"/>
-            <TableColumn fx:id="availableInstructorColumn" text="Instructor" prefWidth="120"/>
+            <TableColumn fx:id="availableInstructorColumn" text="Instructor" prefWidth="150"/>
         </columns>
-        <placeholder>
-            <Label text="No courses available."/>
-        </placeholder>
     </TableView>
 
-    <Button fx:id="enrollButton" text="Enroll in Selected Course" onAction="#handleEnroll"/>
-
-    <Label text="My Enrollments:" style="-fx-font-size: 16px;"/>
-
-    <TableView fx:id="enrolledCoursesTable" prefHeight="180">
+    <Label text="Enrolled Courses:" style="-fx-font-size: 16px;"/>
+    <TableView fx:id="enrolledCoursesTable" prefHeight="200" VBox.vgrow="ALWAYS">
         <columns>
             <TableColumn fx:id="enrolledCourseCodeColumn" text="Course Code" prefWidth="100"/>
             <TableColumn fx:id="enrolledCourseNameColumn" text="Course Name" prefWidth="150"/>
-            <TableColumn fx:id="enrolledCreditHoursColumn" text="Credit Hour" prefWidth="80"/>
+            <TableColumn fx:id="enrolledCreditHoursColumn" text="Credit Hours" prefWidth="100"/>
             <TableColumn fx:id="enrolledCourseDescriptionColumn" text="Description" prefWidth="200"/>
-            <TableColumn fx:id="enrolledInstructorColumn" text="Instructor" prefWidth="120"/>
+            <TableColumn fx:id="enrolledInstructorColumn" text="Instructor" prefWidth="150"/>
         </columns>
-        <placeholder>
-            <Label text="No courses enrolled."/>
-        </placeholder>
     </TableView>
 
-    <HBox spacing="10" style="-fx-padding: 10 0 0 0;">
-        <Button fx:id="dropButton" text="Drop Selected Course" onAction="#handleDropEnrollment"/>
+    <HBox spacing="10" alignment="CENTER">
+        <Button text="Enroll in Course" onAction="#handleEnroll"/>
+        <Button text="Drop Enrollment" onAction="#handleDropEnrollment"/>
         <Button fx:id="goBackButton" text="Go Back" onAction="#handleGoBack"/>
     </HBox>
 </VBox>

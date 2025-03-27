@@ -13,7 +13,6 @@ import java.net.InetAddress;
 import java.net.UnknownHostException;
 
 public class LoginController {
-
     @FXML private TextField studentIdField;
     @FXML private PasswordField passwordField;
     @FXML private Button loginButton;
@@ -41,12 +40,14 @@ public class LoginController {
 
         User user = AuthService.login(studentId, password);
         if (user != null) {
+            // Successful login
             DatabaseLogger.log("INFO", "Successful login for user", ipAddress);
             System.out.println("DEBUG: Logged in user ID=" + user.getId() + ", role=" + user.getRole());
             failedLoginAttempts = 0;
             SessionManager.setCurrentUser(user.getName(), user.getRole(), user.getId());
             loadDashboard(user);
         } else {
+            // Failed login
             failedLoginAttempts++;
             DatabaseLogger.log("WARNING", "Failed login attempt (attempt " + failedLoginAttempts + ")", ipAddress);
             if (failedLoginAttempts >= 3) {
@@ -66,7 +67,8 @@ public class LoginController {
 
     private void loadDashboard(User user) {
         try {
-            javafx.fxml.FXMLLoader loader = new javafx.fxml.FXMLLoader(getClass().getResource("/view/dashboard.fxml"));
+            javafx.fxml.FXMLLoader loader = new javafx.fxml.FXMLLoader(
+                    getClass().getResource("/view/Dashboard.fxml"));
             javafx.scene.Parent root = loader.load();
             DashboardController controller = loader.getController();
             controller.setCurrentUser(user.getName(), user.getRole(), user.getId());
@@ -93,11 +95,13 @@ public class LoginController {
     }
 
     @FXML
-    private void goTaoRegister() {
+    private void goToRegister() {  // Renamed (was goTaoRegister)
         try {
-            javafx.scene.Parent root = javafx.fxml.FXMLLoader.load(getClass().getResource("/view/register.fxml"));
+            javafx.scene.Parent root = javafx.fxml.FXMLLoader.load(
+                    getClass().getResource("/view/register.fxml"));
             studentIdField.getScene().setRoot(root);
         } catch (Exception e) {
+            // Log severe error if navigation fails
             DatabaseLogger.log("SEVERE", "Error navigating to registration screen: " + e.getMessage(), getIpAddress());
             e.printStackTrace();
         }

@@ -1,14 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
-
-<?import java.lang.*?>
-<?import java.util.*?>
-<?import javafx.scene.*?>
 <?import javafx.scene.control.*?>
-<?import javafx.scene.layout.*?>
-
+<?import javafx.scene.layout.VBox?>
 <VBox xmlns:fx="http://javafx.com/fxml" fx:controller="ui.LoginController"
       alignment="CENTER" spacing="10" style="-fx-padding: 20;">
-    <Label text="Login" style="-fx-font-size: 18px;" />
+    <Label text="User Login" style="-fx-font-size: 18px;"/>
     <TextField fx:id="studentIdField" promptText="Student ID" />
     <PasswordField fx:id="passwordField" promptText="Password" />
     <Button fx:id="loginButton" text="Login" onAction="#handleLogin" />

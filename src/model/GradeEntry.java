@@ -13,11 +13,9 @@ public class GradeEntry {
         this.grade = grade;
     }
 
-    // Getters and setters
     public String getStudentId() { return studentId; }
     public String getStudentName() { return studentName; }
     public String getCourseCode() { return courseCode; }
     public String getGrade() { return grade; }
-
     public void setGrade(String grade) { this.grade = grade; }
 }

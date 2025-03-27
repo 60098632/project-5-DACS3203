@@ -5,7 +5,6 @@ public class PaymentController {
 
     public void setStudentId(String studentId) {
         this.studentId = studentId;
+        // TODO: Implement tuition payment logic (if required)
     }
-
-    // TODO: Implement tuition payment logic
 }

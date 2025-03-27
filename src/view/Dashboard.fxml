@@ -1,19 +1,13 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<?import javafx.scene.control.Button?>
-<?import javafx.scene.control.Label?>
-<?import javafx.scene.layout.VBox?>
-
-<VBox xmlns="http://javafx.com/javafx/8"
-      xmlns:fx="http://javafx.com/fxml/1"
-      fx:controller="ui.DashboardController"
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<VBox xmlns:fx="http://javafx.com/fxml" fx:controller="ui.DashboardController"
       spacing="10" alignment="CENTER" style="-fx-padding:20;">
-
-    <Label fx:id="welcomeLabel" text="Welcome!"/>
-
-    <Button fx:id="courseManagementButton" text="Course Management" onAction="#handleCourseManagement"/>
-    <Button fx:id="gradeManagementButton" text="Grade Management" onAction="#handleGradeManagement"/>
-    <Button fx:id="enrollmentButton"       text="Enrollment"        onAction="#handleEnrollment"/>
-    <Button fx:id="transcriptButton"       text="Transcript"        onAction="#handleTranscript"/>
-    <Button fx:id="payTuitionButton"       text="Pay Tuition"       onAction="#handlePayTuition"/>
-    <Button fx:id="logoutButton"           text="Logout"            onAction="#handleLogout"/>
+    <Label fx:id="welcomeLabel" text="Welcome!" style="-fx-font-size: 16px;"/>
+    <Button fx:id="courseManagementButton" text="Manage Courses" onAction="#handleCourseManagement"/>
+    <Button fx:id="enrollmentButton" text="Enroll Courses" onAction="#handleEnrollment"/>
+    <Button fx:id="transcriptButton" text="View Transcript" onAction="#handleTranscript"/>
+    <Button fx:id="payTuitionButton" text="Pay Tuition" onAction="#handlePayTuition"/>
+    <Button fx:id="gradeManagementButton" text="Manage Grades" onAction="#handleGradeManagement"/>
+    <Button fx:id="logoutButton" text="Logout" onAction="#handleLogout"/>
 </VBox>

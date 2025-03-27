@@ -1,16 +1,15 @@
 package ui;
 
-import javafx.scene.input.Clipboard;
-import javafx.scene.input.ClipboardContent;
-import java.util.regex.Pattern;
 import javafx.fxml.FXML;
 import javafx.scene.control.Alert;
 import javafx.scene.control.PasswordField;
 import javafx.scene.control.TextField;
 import service.AuthService;
+import java.util.regex.Pattern;
+import javafx.scene.input.Clipboard;
+import javafx.scene.input.ClipboardContent;
 
 public class RegisterController {
-
     @FXML private TextField nameField;
     @FXML private TextField emailField;
     @FXML private PasswordField passwordField;
@@ -23,16 +22,16 @@ public class RegisterController {
         String password = passwordField.getText();
         String confirmPassword = confirmPasswordField.getText();
 
-        Pattern emailPattern = Pattern.compile("^[\\w.-]+@[\\w.-]+\\.[a-zA-Z]{2,}$");
         Pattern namePattern = Pattern.compile("^[A-Za-z ]{3,}$");
-        Pattern passwordPattern = Pattern.compile("^(?=.*[0-9])(?=.*[a-zA-Z])(?=.*[!@#\\$%^&*]).{8,}$");
+        Pattern emailPattern = Pattern.compile("^[\\w.-]+@[\\w.-]+\\.[A-Za-z]{2,}$");
+        Pattern passwordPattern = Pattern.compile("^(?=.*[0-9])(?=.*[A-Za-z])(?=.*[!@#$%^&*]).{8,}$");
 
         if (name.isEmpty() || email.isEmpty() || password.isEmpty() || confirmPassword.isEmpty()) {
             showAlert("Please fill in all fields.");
             return;
         }
         if (!namePattern.matcher(name).matches()) {
-            showAlert("Invalid name. Use at least 3 letters and only letters/spaces.");
+            showAlert("Invalid name. Use at least 3 letters (letters and spaces only).");
             return;
         }
         if (!emailPattern.matcher(email).matches()) {
@@ -40,7 +39,7 @@ public class RegisterController {
             return;
         }
         if (!passwordPattern.matcher(password).matches()) {
-            showAlert("Password must be at least 8 characters, include a number and a special character.");
+            showAlert("Password must be at least 8 characters and include a number and a special character.");
             return;
         }
         if (!password.equals(confirmPassword)) {
@@ -50,17 +49,16 @@ public class RegisterController {
 
         String generatedId = AuthService.register(name, email, password);
         if (generatedId != null) {
+            // Copy assigned student ID to clipboard and inform the user
             Clipboard clipboard = Clipboard.getSystemClipboard();
-            ClipboardContent clipboardContent = new ClipboardContent();
-            clipboardContent.putString(generatedId);
-            clipboard.setContent(clipboardContent);
-
+            ClipboardContent content = new ClipboardContent();
+            content.putString(generatedId);
+            clipboard.setContent(content);
             showAlert("✅ Registration successful!\nYour University ID is: " + generatedId +
-                    "\n(Your student ID has been copied to clipboard.)");
-
-            goToLogin(); // ← Redirect on success
+                    "\n(It has been copied to the clipboard.)");
+            goToLogin();  // redirect to login on success
         } else {
-            showAlert("❌ Registration failed. Email might already be taken.");
+            showAlert("❌ Registration failed. The email might already be taken.");
         }
     }
 

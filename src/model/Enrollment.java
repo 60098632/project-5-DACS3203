@@ -23,63 +23,23 @@ public class Enrollment {
         this.grade = new SimpleStringProperty(grade);
     }
 
-    public int getEnrollmentId() {
-        return enrollmentId.get();
-    }
+    public int getEnrollmentId() { return enrollmentId.get(); }
+    public void setEnrollmentId(int id) { enrollmentId.set(id); }
+    public IntegerProperty enrollmentIdProperty() { return enrollmentId; }
 
-    public void setEnrollmentId(int id) {
-        this.enrollmentId.set(id);
-    }
+    public String getStudentId() { return studentId.get(); }
+    public void setStudentId(String studentId) { this.studentId.set(studentId); }
+    public StringProperty studentIdProperty() { return studentId; }
 
-    public IntegerProperty enrollmentIdProperty() {
-        return enrollmentId;
-    }
+    public String getCourseCode() { return courseCode.get(); }
+    public void setCourseCode(String courseCode) { this.courseCode.set(courseCode); }
+    public StringProperty courseCodeProperty() { return courseCode; }
 
-    public String getStudentId() {
-        return studentId.get();
-    }
+    public String getSemester() { return semester.get(); }
+    public void setSemester(String semester) { this.semester.set(semester); }
+    public StringProperty semesterProperty() { return semester; }
 
-    public void setStudentId(String studentId) {
-        this.studentId.set(studentId);
-    }
-
-    public StringProperty studentIdProperty() {
-        return studentId;
-    }
-
-    public String getCourseCode() {
-        return courseCode.get();
-    }
-
-    public void setCourseCode(String courseCode) {
-        this.courseCode.set(courseCode);
-    }
-
-    public StringProperty courseCodeProperty() {
-        return courseCode;
-    }
-
-    public String getSemester() {
-        return semester.get();
-    }
-
-    public void setSemester(String semester) {
-        this.semester.set(semester);
-    }
-
-    public StringProperty semesterProperty() {
-        return semester;
-    }
-
-    public String getGrade() {
-        return grade.get();
-    }
-
-    public void setGrade(String grade) {
-        this.grade.set(grade);
-    }
-
-    public StringProperty gradeProperty() {
-        return grade;
-    }
+    public String getGrade() { return grade.get(); }
+    public void setGrade(String grade) { this.grade.set(grade); }
+    public StringProperty gradeProperty() { return grade; }
 }
