@@ -1,11 +1,40 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<?import javafx.scene.control.*?>
-<?import javafx.scene.layout.VBox?>
-<VBox xmlns:fx="http://javafx.com/fxml" fx:controller="ui.LoginController"
-      alignment="CENTER" spacing="10" style="-fx-padding: 20;">
-    <Label text="User Login" style="-fx-font-size: 18px;"/>
-    <TextField fx:id="studentIdField" promptText="Student ID" />
-    <PasswordField fx:id="passwordField" promptText="Password" />
-    <Button fx:id="loginButton" text="Login" onAction="#handleLogin" />
-    <Button text="Register" onAction="#goToRegister" />
-</VBox>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.PasswordField?>
+<?import javafx.scene.control.TextField?>
+<?import javafx.scene.layout.AnchorPane?>
+<?import javafx.scene.shape.Circle?>
+
+<AnchorPane xmlns:fx="http://javafx.com/fxml" fx:controller="ui.LoginController"
+            fx:id="rootPane" prefWidth="600" prefHeight="400"
+            styleClass="root">
+
+    <!-- Decorative circle in the background -->
+    <children>
+        <Circle fx:id="decorCircle"
+                layoutX="120" layoutY="120"
+                radius="100"
+                fill="rgba(255,255,255,0.2)"/>
+
+        <!-- Title label -->
+        <Label text="User Login" layoutX="220" layoutY="80"
+               style="-fx-font-size: 20px; -fx-font-weight: bold; -fx-text-fill: #ffffff;"/>
+
+        <!-- Username (student ID) field -->
+        <TextField fx:id="studentIdField" promptText="Username"
+                   layoutX="150" layoutY="130" prefWidth="300"/>
+
+        <!-- Password field -->
+        <PasswordField fx:id="passwordField" promptText="Password"
+                       layoutX="150" layoutY="180" prefWidth="300"/>
+
+        <!-- Login button -->
+        <Button text="Login" layoutX="150" layoutY="240" prefWidth="140"
+                onAction="#handleLogin"/>
+
+        <!-- Register button -->
+        <Button text="Register" layoutX="310" layoutY="240" prefWidth="140"
+                onAction="#goToRegister"/>
+    </children>
+</AnchorPane>

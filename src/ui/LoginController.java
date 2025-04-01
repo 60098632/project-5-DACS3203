@@ -1,18 +1,21 @@
 package ui;
 
+import javafx.animation.FadeTransition;
 import javafx.fxml.FXML;
-import javafx.scene.control.Alert;
 import javafx.scene.control.Button;
 import javafx.scene.control.PasswordField;
 import javafx.scene.control.TextField;
+import javafx.scene.layout.AnchorPane;
+import javafx.scene.shape.Circle;
+import javafx.util.Duration;
 import model.User;
 import service.AuthService;
 import util.DatabaseLogger;
 import util.SessionManager;
-import java.net.InetAddress;
-import java.net.UnknownHostException;
 
 public class LoginController {
+    @FXML private AnchorPane rootPane;       // The entire AnchorPane
+    @FXML private Circle decorCircle;        // The decorative circle
     @FXML private TextField studentIdField;
     @FXML private PasswordField passwordField;
     @FXML private Button loginButton;
@@ -20,41 +23,47 @@ public class LoginController {
     private static int failedLoginAttempts = 0;
 
     @FXML
+    public void initialize() {
+        // Fade in the entire AnchorPane
+        FadeTransition fadeAll = new FadeTransition(Duration.millis(1200), rootPane);
+        fadeAll.setFromValue(0.0);
+        fadeAll.setToValue(1.0);
+        fadeAll.play();
+
+        // (Optional) Fade in the circle separately if you want a staggered effect
+        FadeTransition fadeCircle = new FadeTransition(Duration.millis(1000), decorCircle);
+        fadeCircle.setFromValue(0.0);
+        fadeCircle.setToValue(1.0);
+        fadeCircle.setDelay(Duration.millis(300)); // start after 300ms
+        fadeCircle.play();
+    }
+
+    @FXML
     private void handleLogin() {
-        String ipAddress = getIpAddress();
-
-        if (failedLoginAttempts >= 3) {
-            disableLogin();
-            showAlert("Too many failed attempts — please try again later.");
-            return;
-        }
-
         String studentId = studentIdField.getText().trim();
         String password = passwordField.getText();
 
+        // Basic input check
         if (studentId.isEmpty() || password.isEmpty()) {
-            DatabaseLogger.log("WARNING", "Login attempt with empty fields", ipAddress);
             showAlert("Please fill in all fields.");
             return;
         }
 
+        // Attempt login
         User user = AuthService.login(studentId, password);
         if (user != null) {
-            // Successful login
-            DatabaseLogger.log("INFO", "Successful login for user", ipAddress);
-            System.out.println("DEBUG: Logged in user ID=" + user.getId() + ", role=" + user.getRole());
+            // Success
             failedLoginAttempts = 0;
             SessionManager.setCurrentUser(user.getName(), user.getRole(), user.getId());
             loadDashboard(user);
         } else {
-            // Failed login
+            // Failure
             failedLoginAttempts++;
-            DatabaseLogger.log("WARNING", "Failed login attempt (attempt " + failedLoginAttempts + ")", ipAddress);
             if (failedLoginAttempts >= 3) {
                 disableLogin();
                 showAlert("Too many failed attempts — please try again later.");
             } else {
-                showAlert("Invalid student ID or password.");
+                showAlert("Invalid username or password.");
             }
         }
     }
@@ -67,9 +76,9 @@ public class LoginController {
 
     private void loadDashboard(User user) {
         try {
-            javafx.fxml.FXMLLoader loader = new javafx.fxml.FXMLLoader(
-                    getClass().getResource("/view/Dashboard.fxml"));
+            javafx.fxml.FXMLLoader loader = new javafx.fxml.FXMLLoader(getClass().getResource("/view/Dashboard.fxml"));
             javafx.scene.Parent root = loader.load();
+            // Pass user info to Dashboard if needed
             DashboardController controller = loader.getController();
             controller.setCurrentUser(user.getName(), user.getRole(), user.getId());
             studentIdField.getScene().setRoot(root);
@@ -79,31 +88,20 @@ public class LoginController {
         }
     }
 
-    private String getIpAddress() {
+    @FXML
+    private void goToRegister() {
         try {
-            return InetAddress.getLocalHost().getHostAddress();
-        } catch (UnknownHostException e) {
-            return "unknown";
+            javafx.scene.Parent root = javafx.fxml.FXMLLoader.load(getClass().getResource("/view/register.fxml"));
+            studentIdField.getScene().setRoot(root);
+        } catch (Exception e) {
+            e.printStackTrace();
         }
     }
 
     private void showAlert(String message) {
-        Alert alert = new Alert(Alert.AlertType.INFORMATION);
+        javafx.scene.control.Alert alert = new javafx.scene.control.Alert(javafx.scene.control.Alert.AlertType.INFORMATION);
         alert.setHeaderText(null);
         alert.setContentText(message);
         alert.showAndWait();
-    }
-
-    @FXML
-    private void goToRegister() {  // Renamed (was goTaoRegister)
-        try {
-            javafx.scene.Parent root = javafx.fxml.FXMLLoader.load(
-                    getClass().getResource("/view/register.fxml"));
-            studentIdField.getScene().setRoot(root);
-        } catch (Exception e) {
-            // Log severe error if navigation fails
-            DatabaseLogger.log("SEVERE", "Error navigating to registration screen: " + e.getMessage(), getIpAddress());
-            e.printStackTrace();
-        }
     }
 }

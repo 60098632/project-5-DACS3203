@@ -1,0 +1,59 @@
+/* styles.css */
+
+/* Root: modern gradient background and font */
+.root {
+    -fx-background-color: linear-gradient(to bottom right, #3AD2B4, #16B89D);
+    -fx-font-family: "Segoe UI", Roboto, sans-serif;
+    -fx-text-fill: #333;
+}
+
+/* Card container style for panels with rounded corners and a drop shadow */
+.card {
+    -fx-background-color: #ffffff;
+    -fx-background-radius: 20;
+    -fx-padding: 20;
+    -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.15), 15, 0, 0, 5);
+}
+
+/* Headings inside cards */
+.heading {
+    -fx-font-size: 20px;
+    -fx-font-weight: bold;
+    -fx-text-fill: #333;
+}
+
+/* Labels inside cards */
+.label {
+    -fx-text-fill: #555;
+    -fx-font-size: 14px;
+}
+
+/* TextFields and PasswordFields with rounded corners and subtle background */
+.text-field, .password-field {
+    -fx-background-color: #f7f7f7;
+    -fx-background-radius: 20;
+    -fx-padding: 8 16;
+    -fx-border-color: transparent;
+    -fx-font-size: 14px;
+}
+
+/* Buttons with a modern gradient, rounded corners, and hover effects */
+.button {
+    -fx-background-color: linear-gradient(#F7A100, #F78000);
+    -fx-background-radius: 20;
+    -fx-font-size: 14px;
+    -fx-text-fill: #ffffff;
+    -fx-cursor: hand;
+    -fx-padding: 8 20;
+    -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.2), 4, 0, 0, 2);
+}
+
+.button:hover {
+    -fx-background-color: linear-gradient(#F8B500, #F79200);
+}
+
+/* Optionally, style decorative shapes */
+.shape-circle {
+    -fx-background-radius: 80;
+    -fx-background-color: rgba(255,255,255,0.2);
+}
